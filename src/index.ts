@@ -224,6 +224,7 @@ export const generateContentsFromGraphqlString = (
   graphqlString: string,
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
+  console.log(graphqlString)
   const graphqlDocument = gql(graphqlString);
   const documentNodeAsString = generateDocumentNodeString(
     graphqlDocument,
