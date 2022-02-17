@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import {
   OperationDefinitionNode,
   DocumentNode,
+  Location,
   DefinitionNode,
   SelectionNode,
   FragmentDefinitionNode,
@@ -225,7 +226,17 @@ export const generateContentsFromGraphqlString = (
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
   console.log(graphqlString)
-  const graphqlDocument = gql(graphqlString);
+  const toModify: any = gql(graphqlString);
+  // Set source
+  toModify.loc.source = {
+    body: graphqlString,
+    name: 'GraphQL request',
+    locationOffset: {
+      line: 1,
+      column: 1,
+    },
+  };
+  const graphqlDocument: DocumentNode = toModify;
   console.log(JSON.stringify(graphqlDocument));
   const documentNodeAsString = generateDocumentNodeString(
     graphqlDocument,
