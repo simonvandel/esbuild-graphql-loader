@@ -30,46 +30,40 @@ interface ParsedGraphQLFile {
   imports: Import[];
 }
 
-// interface MyDocumentNode {
-//   readonly kind: 'Document';
-//   readonly loc?: Location;
-//   readonly definitions: ReadonlyArray<DefinitionNode>;
-// }
+interface MyDocumentNode {
+  readonly kind: 'Document';
+  readonly loc?: MyLocation;
+  readonly definitions: ReadonlyArray<DefinitionNode>;
+}
 
-// interface MyLocation {
-//   /**
-//    * The character offset at which this Node begins.
-//    */
-//   readonly start: number;
+interface MyLocation {
+  /**
+   * The character offset at which this Node begins.
+   */
+  readonly start: number;
 
-//   /**
-//    * The character offset at which this Node ends.
-//    */
-//   readonly end: number;
+  /**
+   * The character offset at which this Node ends.
+   */
+  readonly end: number;
 
-//   /**
-//    * The Token at which this Node begins.
-//    */
-//   readonly startToken: Token;
+  /**
+   * The Token at which this Node begins.
+   */
+  readonly startToken: Token;
 
-//   /**
-//    * The Token at which this Node ends.
-//    */
-//   readonly endToken: Token;
+  /**
+   * The Token at which this Node ends.
+   */
+  readonly endToken: Token;
 
-//   /**
-//    * The Source document the AST represents.
-//    */
-//   readonly source: Source;
+  /**
+   * The Source document the AST represents.
+   */
+  readonly source: Source;
 
-//   toJSON: function() {
-//   return {
-//     start: this.start,
-//     end: this.end,
-//     source: this.source
-//   };
-// };
-// }
+  toJSON(): { start: number; end: number; source: Source };
+}
 
 // Definitions can be undefined, which will get stripped when JSON.stringify is
 // run. For that reason, we temporarily serialize undefined, then swap it back
@@ -79,9 +73,19 @@ const generateDocumentNodeString = (
   graphqlDocument: DocumentNode,
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
-  const documentNodeToUse = mapDocumentNode
-    ? mapDocumentNode(graphqlDocument)
+  const documentNodeToUse: DocumentNode = mapDocumentNode
+    ? (mapDocumentNode(graphqlDocument) as DocumentNode)
     : graphqlDocument;
+
+  if (documentNodeToUse?.loc !== undefined) {
+    documentNodeToUse.loc.toJSON = () => {
+      return {
+        start: documentNodeToUse.loc!.start,
+        end: documentNodeToUse.loc!.end,
+        source: documentNodeToUse.loc!.source,
+      };
+    };
+  }
 
   return JSON.stringify(documentNodeToUse, (key, value) =>
     value === undefined ? '__undefined' : value
