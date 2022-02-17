@@ -73,10 +73,11 @@ const generateDocumentNodeString = (
   graphqlDocument: DocumentNode,
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
-  const documentNodeToUse: DocumentNode = mapDocumentNode
-    ? (mapDocumentNode(graphqlDocument) as DocumentNode)
+  const documentNodeToUse = mapDocumentNode
+    ? mapDocumentNode(graphqlDocument)
     : graphqlDocument;
 
+  // The default toJSON implementation does not output `source` which we want
   if (documentNodeToUse?.loc !== undefined) {
     documentNodeToUse.loc.toJSON = () => {
       return {
@@ -272,28 +273,28 @@ export const generateContentsFromGraphqlString = (
   graphqlString: string,
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
-  let toModify: any = gql(graphqlString);
-  console.log('before: ', JSON.stringify(toModify));
-  console.log('before JSON:', toModify.loc?.source);
-  // Set source
-  toModify.loc.source = {
-    body: graphqlString,
-    name: 'GraphQL request',
-    locationOffset: {
-      line: 1,
-      column: 1,
-    },
-  };
-  toModify.loc.toJSON = () => {
-    return {
-      start: toModify.start,
-      end: toModify.end,
-      source: toModify.source,
-    };
-  };
-  const graphqlDocument: DocumentNode = toModify;
-  console.log('after:', graphqlDocument.loc?.source);
-  console.log('after JSON:', graphqlDocument);
+  const graphqlDocument: DocumentNode = gql(graphqlString);
+  // console.log('before: ', JSON.stringify(toModify));
+  // console.log('before JSON:', toModify.loc?.source);
+  // // Set source
+  // toModify.loc.source = {
+  //   body: graphqlString,
+  //   name: 'GraphQL request',
+  //   locationOffset: {
+  //     line: 1,
+  //     column: 1,
+  //   },
+  // };
+  // toModify.loc.toJSON = () => {
+  //   return {
+  //     start: toModify.start,
+  //     end: toModify.end,
+  //     source: toModify.source,
+  //   };
+  // };
+  // const graphqlDocument: DocumentNode = toModify;
+  // console.log('after:', graphqlDocument.loc?.source);
+  // console.log('after JSON:', graphqlDocument);
   const documentNodeAsString = generateDocumentNodeString(
     graphqlDocument,
     mapDocumentNode
