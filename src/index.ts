@@ -226,9 +226,10 @@ export const generateContentsFromGraphqlString = (
   mapDocumentNode?: (documentNode: DocumentNode) => DocumentNode
 ): string => {
   let toModify: any = gql(graphqlString);
-  console.log('before: ', JSON.stringify(toModify));
+  // console.log('before: ', JSON.stringify(toModify));
+  console.log('after:', toModify.loc?.source);
   // Set source
-  toModify['loc']['source'] = {
+  toModify.loc.source = {
     body: graphqlString,
     name: 'GraphQL request',
     locationOffset: {
@@ -237,7 +238,7 @@ export const generateContentsFromGraphqlString = (
     },
   };
   const graphqlDocument: DocumentNode = toModify;
-  console.log('after:', JSON.stringify(graphqlDocument));
+  console.log('after:', graphqlDocument.loc?.source);
   const documentNodeAsString = generateDocumentNodeString(
     graphqlDocument,
     mapDocumentNode
